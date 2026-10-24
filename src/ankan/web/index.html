@@ -1,0 +1,1129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ankan review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f5f8fc;
+    --surface: #ffffff;
+    --rule: #d3e0ef;
+    --ink: #1c2b45;
+    --ink-soft: #52607a;
+    --red: #c01f3c;
+    --covered: #1d6f55;
+    --partial: #9a6411;
+    --missed: #7e4552;
+    --focus: #2f6fd6;
+    --line: 2rem;
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    font-family: "Atkinson Hyperlegible", system-ui, sans-serif;
+    color: var(--ink);
+    background: var(--paper);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; font-size: 1rem; line-height: 1.5; }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+  /* ---------- top bar ---------- */
+  header {
+    display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+    padding: .75rem 1.25rem; background: var(--surface); border-bottom: 1px solid var(--rule);
+  }
+  .brand { font-weight: 700; font-size: 1.15rem; margin-right: auto; }
+  .brand small { font-weight: 400; color: var(--ink-soft); margin-left: .5rem; }
+
+  .btn {
+    border: 1px solid var(--ink); background: var(--surface); border-radius: var(--radius-sm);
+    padding: .45rem .9rem; cursor: pointer; font-weight: 700;
+  }
+  .btn:hover { background: var(--paper); }
+  .btn.primary { background: var(--ink); color: #fff; }
+  .btn.primary:hover { background: #2a3d5e; }
+  .btn.danger { border-color: var(--red); color: var(--red); }
+  .btn.link { border: none; background: none; text-decoration: underline; padding: 0; font-weight: 400; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+  /* ---------- layout ---------- */
+  main {
+    display: grid; grid-template-columns: 17rem minmax(0, 1fr) 24rem;
+    min-height: calc(100vh - 3.6rem);
+  }
+  @media (max-width: 1100px) { main { grid-template-columns: 15rem minmax(0, 1fr); } .margin { grid-column: 1 / -1; } }
+  @media (max-width: 720px) { main { grid-template-columns: 1fr; } }
+
+  /* ---------- queue ---------- */
+  .queue { border-right: 1px solid var(--rule); background: var(--surface); padding: 1rem; }
+  .queue h2, .margin h2 { font-size: 1rem; margin: 0 0 .75rem; }
+  .tabs { display: flex; gap: .25rem; margin-bottom: .75rem; }
+  .tabs button {
+    flex: 1; border: 1px solid var(--rule); background: var(--paper); padding: .35rem;
+    border-radius: var(--radius-sm); cursor: pointer;
+  }
+  .tabs button[aria-pressed="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .queue ol { list-style: none; margin: 0; padding: 0; display: grid; gap: .35rem; }
+  .queue li button {
+    width: 100%; text-align: left; border: 1px solid transparent; background: none;
+    border-radius: var(--radius-sm); padding: .5rem .6rem; cursor: pointer;
+    display: grid; grid-template-columns: 1fr auto; gap: .1rem .5rem;
+  }
+  .queue li button:hover { background: var(--paper); }
+  .queue li button[aria-current="true"] { border-color: var(--ink); background: var(--paper); }
+  .q-id { font-weight: 700; }
+  .q-score { font-weight: 700; }
+  .q-meta { grid-column: 1 / -1; font-size: .85rem; color: var(--ink-soft); }
+  .q-meta .flagged { color: var(--red); }
+  .empty { color: var(--ink-soft); font-size: .95rem; }
+
+  /* ---------- sheet ---------- */
+  .sheet { padding: 1.25rem; min-width: 0; }
+  .question { max-width: 70ch; margin: 0 0 1rem; }
+  .question p { margin: .25rem 0 0; color: var(--ink-soft); }
+  .scan-wrap { position: relative; display: inline-block; max-width: 100%; border: 1px solid var(--rule); background: #fff; }
+  .scan-wrap img { display: block; max-width: 100%; height: auto; }
+  .ocr-box { position: absolute; border: 2px solid rgba(47, 111, 214, .45); border-radius: 2px; }
+  .ocr-box.weak { border-color: var(--partial); background: rgba(154, 100, 17, .10); }
+  .ocr-box:hover::after {
+    content: attr(data-label); position: absolute; left: 0; top: 100%; z-index: 2;
+    background: var(--ink); color: #fff; font-size: .8rem; padding: .15rem .4rem; white-space: nowrap;
+  }
+  .scan-note { font-size: .85rem; color: var(--ink-soft); margin: .4rem 0 1.25rem; }
+
+  .answer-head { display: flex; align-items: baseline; gap: 1rem; max-width: 70ch; }
+  .answer-head h3 { font-size: 1rem; margin: 0 auto 0 0; }
+  .answer, .answer-edit {
+    max-width: 70ch; min-height: calc(var(--line) * 5); margin: .5rem 0 0;
+    padding: calc(var(--line) * .25) 1rem var(--line) 3.25rem; line-height: var(--line);
+    font-size: 1.05rem; background-color: #fff; white-space: pre-wrap;
+    background-image:
+      linear-gradient(to right, transparent 2.5rem, rgba(192, 31, 60, .35) 2.5rem, rgba(192, 31, 60, .35) calc(2.5rem + 1px), transparent calc(2.5rem + 1px)),
+      repeating-linear-gradient(to bottom, transparent 0 calc(var(--line) - 1px), var(--rule) calc(var(--line) - 1px) var(--line));
+    background-attachment: local;
+    border: 1px solid var(--rule); border-radius: var(--radius-sm);
+  }
+  .answer-edit { width: 100%; resize: vertical; display: block; }
+  .answer mark { background: rgba(29, 111, 85, .16); color: inherit; border-bottom: 2px solid var(--covered); }
+  .answer mark.partial { background: rgba(154, 100, 17, .14); border-color: var(--partial); }
+  .answer mark.active { background: rgba(29, 111, 85, .32); }
+  .edit-actions { display: flex; gap: .5rem; margin-top: .6rem; }
+
+  /* ---------- marking margin ---------- */
+  .margin { border-left: 1px solid var(--rule); background: var(--surface); padding: 1.25rem; }
+  .mark {
+    position: relative; width: 9.5rem; height: 6.5rem; margin: 0 0 .25rem -.25rem;
+    display: grid; place-items: center; color: var(--red);
+  }
+  .mark svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .mark-num { font-family: "Caveat", cursive; font-size: 3.1rem; line-height: 1; position: relative; }
+  .mark-num small { font-size: 1.9rem; }
+  .mark-caption { font-size: .85rem; color: var(--ink-soft); margin: 0 0 1rem; }
+
+  .points { list-style: none; margin: 0 0 1.25rem; padding: 0; display: grid; gap: .5rem; }
+  .points li button {
+    width: 100%; text-align: left; background: none; border: 1px solid var(--rule);
+    border-radius: var(--radius-md); padding: .6rem .7rem; cursor: pointer;
+    display: grid; grid-template-columns: 1.5rem 1fr auto; gap: .15rem .5rem; align-items: start;
+  }
+  .points li button:hover, .points li button[aria-pressed="true"] { border-color: var(--ink); }
+  .glyph { width: 1.4rem; height: 1.4rem; }
+  .covered { color: var(--covered); } .partial { color: var(--partial); } .missed { color: var(--missed); }
+  .kp-text { font-weight: 700; }
+  .kp-marks { font-weight: 700; white-space: nowrap; }
+  .kp-detail { grid-column: 2 / -1; font-size: .88rem; color: var(--ink-soft); }
+  .kp-detail q { color: var(--ink); }
+  .meter { grid-column: 2 / -1; height: 4px; background: var(--rule); border-radius: 2px; overflow: hidden; }
+  .meter span { display: block; height: 100%; background: currentColor; }
+
+  .flags { border-left: 3px solid var(--red); padding: .25rem 0 .25rem .75rem; margin: 0 0 1.25rem; }
+  .flags h3 { font-size: .95rem; margin: 0 0 .35rem; color: var(--red); }
+  .flags ul { margin: 0; padding-left: 1.1rem; font-size: .9rem; }
+  .flags li + li { margin-top: .3rem; }
+
+  fieldset { border: 1px solid var(--rule); border-radius: var(--radius-md); padding: .9rem; margin: 0 0 1.25rem; }
+  legend { font-weight: 700; padding: 0 .3rem; }
+  label { display: block; font-size: .9rem; margin: .5rem 0 .2rem; }
+  input[type="text"], input[type="number"], select, textarea {
+    width: 100%; border: 1px solid #b7c6da; border-radius: var(--radius-sm); padding: .45rem .55rem; background: #fff;
+  }
+  .row { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .75rem; }
+  .override { display: none; }
+  .override.open { display: block; }
+  .decided { padding: .75rem; border-radius: var(--radius-md); background: var(--paper); margin: 0 0 1.25rem; }
+
+  details.audit summary { cursor: pointer; font-weight: 700; font-size: .95rem; }
+  details.audit ol { font-size: .85rem; color: var(--ink-soft); padding-left: 1.2rem; }
+
+  /* ---------- dialogs & toast ---------- */
+  dialog { border: 1px solid var(--rule); border-radius: var(--radius-md); padding: 1.25rem; width: min(36rem, 92vw); color: var(--ink); }
+  dialog::backdrop { background: rgba(28, 43, 69, .35); }
+  dialog h2 { margin: 0 0 .5rem; font-size: 1.15rem; }
+  #qJson { min-height: 10rem; }
+  .hint { font-size: .85rem; color: var(--ink-soft); margin: .25rem 0 0; }
+  .toast {
+    position: fixed; right: 1rem; bottom: 1rem; max-width: 26rem; padding: .75rem 1rem;
+    background: var(--ink); color: #fff; border-radius: var(--radius-md); display: none;
+  }
+  .toast.show { display: block; }
+  .toast.error { background: var(--red); }
+  .welcome { max-width: 62ch; }
+  .welcome h1 { font-size: 1.6rem; margin: .5rem 0; }
+  dialog.wide { width: min(50rem, 94vw); }
+  dialog h3 { font-size: 1rem; margin: 1.25rem 0 .2rem; }
+
+  /* ---------- questions list ---------- */
+  .qlist { list-style: none; margin: .75rem 0 1rem; padding: 0; display: grid; gap: .5rem; }
+  .qlist li {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: .2rem .5rem; align-items: center;
+    border: 1px solid var(--rule); border-radius: var(--radius-md); padding: .65rem .75rem;
+  }
+  .qlist .q-text { font-weight: 700; }
+  .qlist .q-info { grid-column: 1; font-size: .88rem; color: var(--ink-soft); }
+  .qlist .btn { grid-row: 1 / span 2; }
+  @media (max-width: 560px) {
+    .qlist li { grid-template-columns: auto auto 1fr; }
+    .qlist .q-text, .qlist .q-info { grid-column: 1 / -1; }
+    .qlist .btn { grid-row: auto; }
+  }
+
+  /* ---------- question editor ---------- */
+  .points-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-top: 1.25rem; }
+  .points-head h3 { margin: 0; }
+  .total { font-weight: 700; margin: 0; white-space: nowrap; }
+  .points-cols, .point-row {
+    display: grid; grid-template-columns: 1.75rem minmax(0, 1fr) 4.75rem 2.25rem; gap: .3rem .5rem; align-items: center;
+  }
+  .points-cols { font-size: .85rem; color: var(--ink-soft); margin-top: .6rem; }
+  .points-editor { list-style: none; margin: .3rem 0 .6rem; padding: 0; display: grid; gap: .45rem; }
+  .point-row .num {
+    width: 1.75rem; height: 1.75rem; border-radius: 50%; border: 1px solid var(--rule); background: var(--paper);
+    display: grid; place-items: center; font-size: .85rem; font-weight: 700;
+  }
+  .point-row .words { grid-column: 2 / 4; }
+  .remove {
+    width: 2.25rem; height: 2.25rem; border: 1px solid transparent; border-radius: var(--radius-sm);
+    background: none; color: var(--ink-soft); cursor: pointer; font-size: 1.3rem; line-height: 1;
+  }
+  .remove:hover { color: var(--red); border-color: var(--red); }
+  .remove:disabled { visibility: hidden; }
+  .check { display: flex; gap: .5rem; align-items: flex-start; font-size: .95rem; margin: .9rem 0 .25rem; }
+  .check input { margin-top: .3rem; width: auto; }
+  details.advanced { margin-top: 1.25rem; border-top: 1px solid var(--rule); padding-top: .75rem; }
+  details.advanced summary { cursor: pointer; font-weight: 700; }
+  details.advanced details summary { font-weight: 400; color: var(--ink-soft); margin-top: 1rem; }
+  [aria-invalid="true"] { border-color: var(--red) !important; box-shadow: 0 0 0 1px var(--red); }
+
+  /* ---------- add answer ---------- */
+  .drop {
+    position: relative; display: grid; justify-items: center; gap: .35rem; margin: .25rem 0 0;
+    border: 2px dashed #b7c6da; border-radius: var(--radius-md); padding: 1.4rem 1rem;
+    text-align: center; cursor: pointer; background: var(--paper);
+  }
+  .drop:hover, .drop.over { border-color: var(--focus); background: #eaf1fc; }
+  .drop:focus-within { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+  .preview { max-width: 100%; max-height: 11rem; border: 1px solid var(--rule); border-radius: var(--radius-sm); }
+
+  /* ---------- welcome steps ---------- */
+  .steps { list-style: none; padding: 0; margin: 1.25rem 0; display: grid; gap: .9rem; counter-reset: step; }
+  .steps li { display: grid; grid-template-columns: 2.1rem 1fr; column-gap: .8rem; }
+  .steps li::before {
+    counter-increment: step; content: counter(step); grid-row: span 2; width: 2.1rem; height: 2.1rem;
+    border-radius: 50%; border: 2px solid var(--ink); display: grid; place-items: center; font-weight: 700;
+  }
+  .steps li.done::before { content: "\2713"; background: var(--covered); border-color: var(--covered); color: #fff; }
+  .steps p { margin: 0; color: var(--ink-soft); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .mark.animate path { stroke-dasharray: 420; stroke-dashoffset: 420; animation: draw .7s ease-out .1s forwards; }
+    @keyframes draw { to { stroke-dashoffset: 0; } }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">Ankan <small>answer marking</small></div>
+  <label class="sr-only" for="questionFilter">Show answers for</label>
+  <select id="questionFilter" style="width:auto;max-width:20rem"></select>
+  <button class="btn" id="questionsBtn" type="button">Questions</button>
+  <button class="btn" id="exportBtn" type="button">Export marks</button>
+  <button class="btn primary" id="uploadBtn" type="button">Add answer</button>
+</header>
+
+<main>
+  <nav class="queue" aria-label="Review queue">
+    <h2>Answers to review</h2>
+    <div class="tabs" role="group" aria-label="Show">
+      <button type="button" data-tab="pending" aria-pressed="true">To review</button>
+      <button type="button" data-tab="done" aria-pressed="false">Decided</button>
+    </div>
+    <ol id="queueList"></ol>
+  </nav>
+
+  <section class="sheet" id="sheet" aria-live="polite"></section>
+  <aside class="margin" id="margin" aria-label="Marking"></aside>
+</main>
+
+<dialog id="uploadDialog">
+  <form id="uploadForm" novalidate>
+    <h2>Add an answer</h2>
+    <label for="upQuestion">Question</label>
+    <select id="upQuestion"></select>
+
+    <div class="tabs" role="group" aria-label="How to add the answer" style="margin-top:1rem">
+      <button type="button" data-mode="photo" aria-pressed="true">Photo of the answer</button>
+      <button type="button" data-mode="text" aria-pressed="false">Type the answer</button>
+    </div>
+
+    <div id="photoPane">
+      <label class="drop" id="dropZone">
+        <input id="upFile" type="file" multiple accept="image/png,image/jpeg,image/webp,image/bmp,image/tiff" aria-describedby="photoHint">
+        <strong id="dropLabel">Choose photos, or drop them here</strong>
+        <span class="hint" id="photoHint">One photo per student. Take it straight on, in good light, with the whole answer in view.</span>
+        <img id="upPreview" class="preview" alt="Preview of the chosen photo" hidden>
+      </label>
+    </div>
+    <div id="textPane" hidden>
+      <label for="upText">Answer text</label>
+      <textarea id="upText" rows="6" maxlength="20000" placeholder="Type or paste the student's answer"></textarea>
+    </div>
+
+    <div id="refPane">
+      <label for="upRef">Roll number or student code (optional)</label>
+      <input id="upRef" type="text" maxlength="64" autocomplete="off">
+    </div>
+    <p class="hint" id="refHint">Only included in the exported marks. It is hidden while you review, so marking stays fair.</p>
+    <div class="row">
+      <button class="btn primary" id="uploadSubmit" type="submit">Check answer</button>
+      <button class="btn" type="button" data-close>Cancel</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="questionsDialog" aria-labelledby="qlTitle">
+  <h2 id="qlTitle">Questions</h2>
+  <ul class="qlist" id="qList"></ul>
+  <div class="row">
+    <button class="btn primary" type="button" id="qlNew">New question</button>
+    <button class="btn" type="button" data-close>Close</button>
+  </div>
+</dialog>
+
+<dialog id="questionDialog" class="wide" aria-labelledby="qTitle">
+  <form id="questionForm" novalidate>
+    <h2 id="qTitle">New question</h2>
+    <label for="qText">Question</label>
+    <textarea id="qText" rows="2" maxlength="2000" placeholder="Type the question as it appears on the paper"></textarea>
+
+    <div class="points-head">
+      <h3>Points to look for</h3>
+      <p class="total" id="qTotal" aria-live="polite"></p>
+    </div>
+    <p class="hint">Each point is one idea a full-mark answer must include. Press Enter for the next point, or paste a list with one point per line.</p>
+    <div class="points-cols" aria-hidden="true"><span></span><span>Point</span><span>Marks</span><span></span></div>
+    <ol class="points-editor" id="qPoints"></ol>
+    <button class="btn" type="button" id="qAddPoint">Add a point</button>
+
+    <details class="advanced" id="qMore">
+      <summary>More options</summary>
+      <label for="qModel">Model answer (optional)</label>
+      <textarea id="qModel" rows="3" maxlength="10000" placeholder="The answer you would give full marks to. It helps the AI grader."></textarea>
+      <div class="row"><button class="btn" type="button" id="qSuggest">Make points from the model answer</button></div>
+      <label class="check"><input type="checkbox" id="qPartial" checked> <span>Give half the marks when a point is only partly made</span></label>
+      <label class="check"><input type="checkbox" id="qUseWords"> <span>Also list keywords for each point (helps the offline grader)</span></label>
+      <label for="qStep">Round each answer's total to the nearest</label>
+      <select id="qStep" style="width:auto">
+        <option value="0.5">half mark</option>
+        <option value="1">whole mark</option>
+      </select>
+      <details id="qAdvanced">
+        <summary>View or paste the question as JSON</summary>
+        <label for="qJson">Question as JSON</label>
+        <textarea id="qJson" rows="8" spellcheck="false" style="font-size:.85rem"></textarea>
+        <div class="row"><button class="btn" type="button" id="qApplyJson">Load this JSON into the form</button></div>
+      </details>
+    </details>
+    <p class="hint" id="qVersionNote" hidden>Answers already checked keep the marks they were given. To check one again with these changes, open it and use "Correct the text", then "Re-grade".</p>
+
+    <div class="row" style="margin-top:1.25rem">
+      <button class="btn primary" type="submit">Save question</button>
+      <button class="btn" type="button" data-close>Cancel</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+"use strict";
+
+const STATUS_WORD = { covered: "Covered", partial: "Partly covered", missed: "Missed" };
+const FLAG_WORD = {
+  empty_answer: "Blank answer", low_ocr_confidence: "Unclear handwriting",
+  borderline_key_point: "Close call", negation_in_evidence: "Possible negation",
+  unverified_evidence: "Quote not found", grader_disagreement: "Graders disagree",
+  grader_fallback: "Backup grader used"
+};
+
+const state = {
+  rubrics: [], tab: "pending", queue: [], current: null, activeKp: null, editing: false,
+  lowConfidence: 0.6, maxUploadMb: 10, drawnFor: null, editingId: null, uploadMode: "photo"
+};
+const $ = (sel) => document.querySelector(sel);
+
+// ---------------------------------------------------------------- helpers
+function el(tag, attrs = {}, ...children) {
+  const node = document.createElement(tag);
+  for (const [key, value] of Object.entries(attrs)) {
+    if (value === null || value === undefined || value === false) continue;
+    if (key === "class") node.className = value;
+    else if (key.startsWith("on")) node.addEventListener(key.slice(2), value);
+    else node.setAttribute(key, value === true ? "" : String(value));
+  }
+  for (const child of children.flat()) {
+    if (child === null || child === undefined || child === false) continue;
+    node.append(child instanceof Node ? child : document.createTextNode(String(child)));
+  }
+  return node;
+}
+function svg(markup) {
+  const wrap = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  wrap.setAttribute("viewBox", "0 0 24 24"); wrap.setAttribute("aria-hidden", "true");
+  wrap.setAttribute("class", "glyph"); wrap.innerHTML = markup; // static markup only
+  return wrap;
+}
+const GLYPHS = {
+  covered: '<path d="M4 13l5 5L20 6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>',
+  partial: '<path d="M4 13l5 5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M9 18l5-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-dasharray="2 3"/>',
+  missed: '<path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>'
+};
+const fmt = (n) => (Math.round(n * 100) / 100).toString();
+const shorten = (text, max) => (text.length > max ? `${text.slice(0, max - 1).trimEnd()}\u2026` : text);
+function storage(key, value) {
+  try {
+    if (value === undefined) return localStorage.getItem(key) || "";
+    localStorage.setItem(key, value);
+  } catch (_) { /* storage can be unavailable; the UI works without it */ }
+  return "";
+}
+let toastTimer;
+function toast(message, isError = false) {
+  const node = $("#toast");
+  // An open modal dialog sits above the page, so show the message inside it to keep it visible.
+  const host = document.querySelector("dialog[open]") || document.body;
+  if (node.parentElement !== host) host.append(node);
+  node.textContent = message;
+  node.className = "toast show" + (isError ? " error" : "");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { node.className = "toast"; }, isError ? 7000 : 3500);
+}
+async function api(path, options = {}) {
+  const response = await fetch(path, options);
+  const type = response.headers.get("content-type") || "";
+  const body = type.includes("json") ? await response.json() : await response.text();
+  if (!response.ok) {
+    let detail = body && body.detail !== undefined ? body.detail : body;
+    const fail = (message) => Object.assign(new Error(message), { status: response.status });
+    if (Array.isArray(detail)) {
+      detail = detail.map((d) => {
+        const where = (d.loc || []).slice(1).join(".");
+        const msg = String(d.msg || "").replace(/^Value error, /, "");
+        return where ? `${where}: ${msg}` : msg;
+      }).join("; ");
+    }
+    throw fail(typeof detail === "string" && detail ? detail : `Request failed (${response.status})`);
+  }
+  return body;
+}
+
+// ---------------------------------------------------------------- data
+async function loadRubrics() {
+  state.rubrics = await api("/api/rubrics");
+  const filter = $("#questionFilter"), up = $("#upQuestion");
+  const previous = filter.value;
+  filter.replaceChildren(el("option", { value: "" }, "All questions"),
+    ...state.rubrics.map((r) => el("option", { value: r.question_id }, shorten(r.question, 48))));
+  up.replaceChildren(...state.rubrics.map((r) => el("option", { value: r.question_id }, shorten(r.question, 70))));
+  if ([...filter.options].some((o) => o.value === previous)) filter.value = previous;
+}
+
+async function loadQueue(selectId) {
+  const params = new URLSearchParams();
+  if ($("#questionFilter").value) params.set("question_id", $("#questionFilter").value);
+  if (state.tab === "pending") params.set("status", "pending");
+  let items = await api("/api/submissions?" + params);
+  if (state.tab === "done") items = items.filter((s) => s.status !== "pending");
+  state.queue = items;
+  renderQueue();
+  const target = selectId || (state.current && items.some((s) => s.id === state.current.id) ? state.current.id : items[0] && items[0].id);
+  if (target) await openSubmission(target); else renderEmpty();
+}
+
+async function openSubmission(id) {
+  state.current = await api(`/api/submissions/${encodeURIComponent(id)}`);
+  state.activeKp = null; state.editing = false;
+  renderQueue(); renderSheet(); renderMargin();
+}
+
+// ---------------------------------------------------------------- render
+function renderQueue() {
+  const list = $("#queueList");
+  if (!state.queue.length) {
+    list.replaceChildren(el("li", { class: "empty" },
+      state.tab === "pending" ? "Nothing waiting. Add an answer to start." : "No decided answers yet."));
+    return;
+  }
+  list.replaceChildren(...state.queue.map((s) => {
+    const flags = s.proposed.flags.length;
+    const score = s.status === "pending" ? s.proposed.score : s.final_score;
+    return el("li", {}, el("button", {
+      type: "button", "aria-current": state.current && state.current.id === s.id ? "true" : "false",
+      onclick: () => openSubmission(s.id).catch((e) => toast(e.message, true))
+    },
+      el("span", { class: "q-id" }, `Answer ${s.id.slice(0, 6)}`),
+      el("span", { class: "q-score" }, `${fmt(score)}/${fmt(s.proposed.max_marks)}`),
+      el("span", { class: "q-meta" }, `${shorten((rubricFor(s) || { question: s.question_id }).question, 34)}, `,
+        s.status === "pending"
+          ? (flags ? el("span", { class: "flagged" }, `${flags} to check`) : "no flags")
+          : s.status)
+    ));
+  }));
+}
+
+function renderEmpty() {
+  state.current = null;
+  $("#margin").replaceChildren();
+  if (state.tab === "done") {
+    $("#sheet").replaceChildren(el("div", { class: "welcome" },
+      el("h1", {}, "No decided marks yet"),
+      el("p", {}, "Answers you approve or change appear here, ready to export.")));
+    return;
+  }
+  const hasQuestions = state.rubrics.length > 0;
+  const step = (done, title, text) => el("li", { class: done ? "done" : null },
+    el("strong", {}, title), el("p", {}, text));
+  $("#sheet").replaceChildren(el("div", { class: "welcome" },
+    el("h1", {}, hasQuestions ? "Nothing waiting for review" : "Welcome to Ankan"),
+    el("p", {}, "Ankan reads handwritten answers, checks them against your marking scheme, and suggests a mark. Nothing counts until you approve it."),
+    el("ol", { class: "steps" },
+      step(hasQuestions, "Set up a question", "Type the question and list the points a full-mark answer must make, with marks for each."),
+      step(false, "Add answers", "Upload photos of the students' answers, several at once if you like, or type an answer in."),
+      step(false, "Review the marks", "Check each suggested mark, fix anything misread, then approve or change it.")),
+    el("div", { class: "row" }, hasQuestions
+      ? el("button", { class: "btn primary", type: "button", onclick: openUpload }, "Add an answer")
+      : el("button", { class: "btn primary", type: "button", onclick: () => openEditor(null) }, "Set up a question"))
+  ));
+}
+
+function rubricFor(sub) { return state.rubrics.find((r) => r.question_id === sub.question_id); }
+
+function highlightedAnswer(text, points) {
+  // Mark each evidence quote in the answer; overlapping quotes keep the first match.
+  // Evidence spans are whitespace-normalised, so match any run of whitespace (OCR line breaks).
+  const ranges = [];
+  const escape = (w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  for (const kp of points) {
+    if (!kp.evidence || kp.status === "missed") continue;
+    const pattern = kp.evidence.trim().split(/\s+/).map(escape).join("\\s+");
+    const found = pattern ? new RegExp(pattern, "i").exec(text) : null;
+    if (!found) continue;
+    const at = found.index, end = at + found[0].length;
+    if (ranges.some((r) => at < r.end && end > r.start)) continue;
+    ranges.push({ start: at, end, kp });
+  }
+  ranges.sort((a, b) => a.start - b.start);
+  const parts = []; let cursor = 0;
+  for (const r of ranges) {
+    parts.push(text.slice(cursor, r.start));
+    parts.push(el("mark", {
+      class: (r.kp.status === "partial" ? "partial " : "") + (state.activeKp === r.kp.key_point_id ? "active" : ""),
+      title: r.kp.key_point_id
+    }, text.slice(r.start, r.end)));
+    cursor = r.end;
+  }
+  parts.push(text.slice(cursor));
+  return parts;
+}
+
+function renderSheet() {
+  const sub = state.current, rubric = rubricFor(sub);
+  const nodes = [];
+  if (rubric) nodes.push(el("div", { class: "question" }, el("strong", {}, "Question"), el("p", {}, rubric.question)));
+
+  if (sub.has_image) {
+    const wrap = el("div", { class: "scan-wrap" });
+    const img = el("img", { src: `/api/submissions/${sub.id}/page.png`, alt: "Scanned answer page" });
+    img.addEventListener("load", () => {
+      const scale = img.clientWidth / img.naturalWidth;
+      const threshold = state.lowConfidence;
+      for (const [i, line] of sub.ocr.lines.entries()) {
+        if (!line.box) continue;
+        const weak = line.confidence !== null && line.confidence < threshold;
+        const conf = line.confidence === null ? "n/a" : `${Math.round(line.confidence * 100)}%`;
+        wrap.append(el("div", {
+          class: "ocr-box" + (weak ? " weak" : ""),
+          "data-label": `Line ${i + 1}: ${conf} sure`,
+          style: `left:${line.box.x * scale}px;top:${line.box.y * scale}px;width:${line.box.width * scale}px;height:${line.box.height * scale}px`
+        }));
+      }
+    });
+    wrap.append(img);
+    const angle = sub.ocr.skew_angle ? ` Page straightened by ${fmt(Math.abs(sub.ocr.skew_angle))}°.` : "";
+    nodes.push(wrap, el("p", { class: "scan-note" },
+      `Read with ${sub.ocr.engine}. Amber boxes are lines the handwriting model was unsure about.${angle}`));
+  }
+
+  const pending = sub.status === "pending";
+  nodes.push(el("div", { class: "answer-head" },
+    el("h3", {}, sub.has_image ? "What the model read" : "Typed answer"),
+    pending && !state.editing ? el("button", { class: "btn link", type: "button", onclick: () => { state.editing = true; renderSheet(); } }, "Correct the text") : null
+  ));
+
+  if (state.editing) {
+    const area = el("textarea", { class: "answer-edit", id: "answerEdit", "aria-label": "Corrected answer text" });
+    area.value = sub.answer_text;
+    nodes.push(area, el("div", { class: "edit-actions" },
+      el("button", { class: "btn primary", type: "button", onclick: regrade }, "Re-grade with this text"),
+      el("button", { class: "btn", type: "button", onclick: () => { state.editing = false; renderSheet(); } }, "Cancel")));
+  } else {
+    nodes.push(el("div", { class: "answer" }, sub.answer_text
+      ? highlightedAnswer(sub.answer_text, sub.proposed.key_points)
+      : el("em", {}, "No text was found.")));
+  }
+  $("#sheet").replaceChildren(...nodes);
+  if (state.editing) $("#answerEdit").focus();
+}
+
+function scoreMark(score, max, animate, final) {
+  const label = `${final ? "Final" : "Proposed"} mark ${fmt(score)} out of ${fmt(max)}`;
+  const box = el("div", { class: animate ? "mark animate" : "mark", role: "img", "aria-label": label });
+  const ring = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  ring.setAttribute("viewBox", "0 0 150 100"); ring.setAttribute("aria-hidden", "true");
+  ring.innerHTML = '<path d="M30 22 C 62 4, 128 8, 140 44 C 150 80, 96 98, 58 92 C 20 86, 4 62, 12 40 C 18 26, 40 14, 70 12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>';
+  box.append(ring, el("span", { class: "mark-num" }, fmt(score), el("small", {}, `/${fmt(max)}`)));
+  return box;
+}
+
+function renderMargin() {
+  const sub = state.current, grade = sub.proposed;
+  const decided = sub.status !== "pending";
+  const shown = decided ? sub.final_score : grade.score;
+  const nodes = [
+    // Draw the circle once per answer, not on every re-render (e.g. selecting a key point).
+    scoreMark(shown, grade.max_marks, state.drawnFor !== `${sub.id}:${sub.status}`, decided),
+    el("p", { class: "mark-caption" }, decided
+      ? `Final mark, ${sub.status} by ${sub.reviewer}.`
+      : `Proposed by the ${grade.grader} grader. You make the final call.`)
+  ];
+
+  if (grade.flags.length) {
+    nodes.push(el("section", { class: "flags", "aria-label": "Check before approving" },
+      el("h3", {}, "Check before approving"),
+      el("ul", {}, grade.flags.map((f) => el("li", {}, el("strong", {}, `${FLAG_WORD[f.code] || f.code}. `), f.message.charAt(0).toUpperCase() + f.message.slice(1))))));
+  }
+
+  nodes.push(el("h2", {}, "Points from the marking scheme"));
+  nodes.push(el("ol", { class: "points" }, grade.key_points.map((kp) => {
+    const detail = kp.status === "missed"
+      ? "Not found in the answer."
+      : (kp.evidence ? el("span", {}, "Found: ", el("q", {}, kp.evidence)) : "No quote available.");
+    return el("li", {}, el("button", {
+      type: "button", class: kp.status, "aria-pressed": state.activeKp === kp.key_point_id ? "true" : "false",
+      "aria-label": `${kp.description}: ${STATUS_WORD[kp.status]}, ${fmt(kp.marks_awarded)} of ${fmt(kp.marks_possible)} marks`,
+      onclick: () => { state.activeKp = state.activeKp === kp.key_point_id ? null : kp.key_point_id; renderSheet(); renderMargin(); }
+    },
+      svg(GLYPHS[kp.status]),
+      el("span", { class: "kp-text" }, kp.description),
+      el("span", { class: "kp-marks" }, `${fmt(kp.marks_awarded)}/${fmt(kp.marks_possible)}`),
+      el("span", { class: "kp-detail" }, STATUS_WORD[kp.status], ". ", detail, kp.rationale ? ` ${kp.rationale}` : ""),
+      kp.similarity === null ? null : el("span", { class: "meter", title: `Similarity ${kp.similarity.toFixed(2)}` },
+        el("span", { style: `width:${Math.round(kp.similarity * 100)}%` }))
+    ));
+  })));
+
+  if (decided) {
+    nodes.push(el("div", { class: "decided" },
+      el("strong", {}, sub.status === "approved" ? "Approved as proposed." : `Changed from ${fmt(grade.score)} to ${fmt(sub.final_score)}.`),
+      sub.comment ? el("p", { style: "margin:.4rem 0 0" }, sub.comment) : null));
+  } else {
+    nodes.push(decisionForm(grade));
+  }
+
+  nodes.push(el("details", { class: "audit" }, el("summary", {}, "History"),
+    el("ol", {}, sub.audit.map((a) => el("li", {},
+      `${new Date(a.at).toLocaleString()}: ${a.action} by ${a.actor}`,
+      a.details && a.details.score !== undefined ? ` (score ${fmt(a.details.score)})` : "",
+      a.details && a.details.final_score !== undefined ? ` (final ${fmt(a.details.final_score)})` : "")))));
+  $("#margin").replaceChildren(...nodes);
+  state.drawnFor = `${sub.id}:${sub.status}`;
+}
+
+function decisionForm(grade) {
+  const reviewer = el("input", { type: "text", id: "reviewer", maxlength: 100, autocomplete: "name", required: true });
+  reviewer.value = storage("ankan.reviewer");
+  const score = el("input", { type: "number", id: "finalScore", min: 0, max: grade.max_marks, step: "0.5" });
+  score.value = grade.score;
+  const comment = el("textarea", { id: "comment", rows: 3, maxlength: 2000 });
+  const overrideBox = el("div", { class: "override", id: "overrideBox" },
+    el("label", { for: "finalScore" }, `Your mark (0 to ${fmt(grade.max_marks)})`), score,
+    el("label", { for: "comment" }, "Reason for the change (kept in the history)"), comment,
+    el("div", { class: "row" }, el("button", { class: "btn danger", type: "button", onclick: () => decide("override") }, "Save my mark")));
+
+  return el("fieldset", {}, el("legend", {}, "Your decision"),
+    el("label", { for: "reviewer" }, "Your name"), reviewer,
+    el("div", { class: "row" },
+      el("button", { class: "btn primary", type: "button", onclick: () => decide("approve") }, `Approve ${fmt(grade.score)}/${fmt(grade.max_marks)}`),
+      el("button", { class: "btn", type: "button", "aria-expanded": "false", onclick: (e) => {
+        const open = overrideBox.classList.toggle("open");
+        e.currentTarget.setAttribute("aria-expanded", String(open));
+        if (open) score.focus();
+      } }, "Change mark")),
+    overrideBox);
+}
+
+// ---------------------------------------------------------------- actions
+async function decide(action) {
+  const reviewer = $("#reviewer").value.trim();
+  if (!reviewer) { toast("Add your name so the decision is recorded against it.", true); $("#reviewer").focus(); return; }
+  storage("ankan.reviewer", reviewer);
+  const body = { action, reviewer };
+  if (action === "override") {
+    const raw = $("#finalScore").value;
+    if (raw === "") { toast("Enter your mark.", true); return; }
+    body.final_score = Number(raw);
+    body.comment = $("#comment").value.trim();
+    if (!body.comment) { toast("Add a reason for changing the mark.", true); $("#comment").focus(); return; }
+  }
+  try {
+    const id = state.current.id;
+    await api(`/api/submissions/${id}/decision`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    toast(action === "approve" ? "Mark approved." : "Mark saved.");
+    const next = state.queue.find((s) => s.id !== id && s.status === "pending");
+    await loadQueue(state.tab === "pending" && next ? next.id : (state.tab === "done" ? id : undefined));
+  } catch (e) { toast(e.message, true); }
+}
+
+async function regrade() {
+  const text = $("#answerEdit").value;
+  const typed = $("#reviewer") ? $("#reviewer").value.trim() : "";
+  const actor = typed || storage("ankan.reviewer") || "teacher";
+  try {
+    state.current = await api(`/api/submissions/${state.current.id}/regrade`, {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text, actor })
+    });
+    state.editing = false; state.activeKp = null;
+    renderSheet(); renderMargin();
+    await loadQueue(state.current.id);
+    toast("Re-graded with the corrected text.");
+  } catch (e) { toast(e.message, true); }
+}
+
+// ---------------------------------------------------------------- add answer
+let previewUrl = null;
+
+function setUploadMode(mode) {
+  state.uploadMode = mode;
+  document.querySelectorAll("[data-mode]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === mode)));
+  $("#photoPane").hidden = mode !== "photo";
+  $("#textPane").hidden = mode !== "text";
+  showChosenPhoto();
+}
+
+const chosenPhotos = () => [...$("#upFile").files];
+const submitLabel = () => {
+  const count = state.uploadMode === "photo" ? chosenPhotos().length : 1;
+  return count > 1 ? `Check ${count} answers` : "Check answer";
+};
+const fileStem = (name) => name.replace(/\.[^.]+$/, "").trim().slice(0, 64);
+
+function showChosenPhoto() {
+  const files = chosenPhotos();
+  if (previewUrl) URL.revokeObjectURL(previewUrl);
+  previewUrl = files.length ? URL.createObjectURL(files[0]) : null;
+  $("#upPreview").hidden = !files.length;
+  if (files.length) $("#upPreview").src = previewUrl;
+  const many = files.length > 1;
+  $("#dropLabel").textContent = !files.length ? "Choose photos, or drop them here"
+    : many ? `${files.length} photos chosen (choose again to replace them)`
+    : `${files[0].name} (choose another to replace it)`;
+  $("#uploadSubmit").textContent = submitLabel();
+  // With several photos, each file name becomes that student's reference.
+  $("#refPane").hidden = many && state.uploadMode === "photo";
+  $("#refHint").textContent = many && state.uploadMode === "photo"
+    ? "Each photo is checked separately, and its file name (for example R-17.jpg) is used as the roll number in the exported marks."
+    : "Only included in the exported marks. It is hidden while you review, so marking stays fair.";
+}
+
+function resetUpload() {
+  $("#uploadForm").reset();
+  setUploadMode(state.uploadMode);
+}
+
+function openUpload() {
+  if (!state.rubrics.length) { toast("Set up a question first."); openEditor(null); return; }
+  resetUpload();
+  if ($("#questionFilter").value) $("#upQuestion").value = $("#questionFilter").value;
+  $("#uploadDialog").showModal();
+}
+
+document.querySelectorAll("[data-mode]").forEach((b) => b.addEventListener("click", () => setUploadMode(b.dataset.mode)));
+$("#upFile").addEventListener("change", showChosenPhoto);
+const dropZone = $("#dropZone");
+["dragenter", "dragover"].forEach((type) => dropZone.addEventListener(type, (e) => { e.preventDefault(); dropZone.classList.add("over"); }));
+["dragleave", "drop"].forEach((type) => dropZone.addEventListener(type, () => dropZone.classList.remove("over")));
+dropZone.addEventListener("drop", (e) => {
+  e.preventDefault();
+  if (!e.dataTransfer || !e.dataTransfer.files.length) return;
+  $("#upFile").files = e.dataTransfer.files;
+  showChosenPhoto();
+});
+
+async function submitAnswer(fields) {
+  const form = new FormData();
+  form.append("question_id", $("#upQuestion").value);
+  for (const [key, value] of Object.entries(fields)) if (value) form.append(key, value);
+  return api("/api/submissions", { method: "POST", body: form });
+}
+
+$("#uploadForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const button = $("#uploadSubmit");
+  const finish = async (firstId, message, isError) => {
+    $("#uploadDialog").close();
+    state.tab = "pending"; syncTabs();
+    await loadQueue(firstId);
+    toast(message, isError);
+  };
+
+  if (state.uploadMode === "text") {
+    const text = $("#upText").value;
+    if (!text.trim()) { toast("Type the answer first.", true); $("#upText").focus(); return; }
+    button.disabled = true; button.textContent = "Checking…";
+    try {
+      const created = await submitAnswer({ text, student_ref: $("#upRef").value.trim() });
+      await finish(created.id, "Answer checked. Review the suggested mark.");
+    } catch (e) { toast(e.message, true); }
+    finally { button.disabled = false; button.textContent = submitLabel(); }
+    return;
+  }
+
+  const files = chosenPhotos();
+  if (!files.length) { toast("Choose a photo of the answer first.", true); return; }
+  const tooBig = files.find((f) => f.size > state.maxUploadMb * 1024 * 1024);
+  if (tooBig) { toast(`${tooBig.name} is larger than ${state.maxUploadMb} MB. Use a smaller photo.`, true); return; }
+
+  button.disabled = true;
+  let firstId = null, checked = 0;
+  const failures = [];
+  for (const [i, file] of files.entries()) {
+    button.textContent = files.length > 1 ? `Checking ${i + 1} of ${files.length}…` : "Reading the handwriting…";
+    try {
+      const ref = files.length > 1 ? fileStem(file.name) : $("#upRef").value.trim();
+      const created = await submitAnswer({ file, student_ref: ref });
+      firstId = firstId || created.id;
+      checked += 1;
+    } catch (e) {
+      failures.push(`${file.name}: ${e.message}`);
+      if (e.status === 502 || e.status === 503) break; // a setup problem: every photo would fail
+    }
+  }
+  button.disabled = false; button.textContent = submitLabel();
+
+  if (!checked) { toast(failures[0], true); return; }
+  if (!failures.length) {
+    await finish(firstId, checked === 1 ? "Answer checked. Review the suggested mark." : `${checked} answers checked. Review the suggested marks.`);
+  } else {
+    await finish(firstId, `Checked ${checked} of ${files.length}. Could not check ${failures[0]}`, true);
+  }
+});
+
+// ---------------------------------------------------------------- questions list
+const plural = (n, word) => `${fmt(n)} ${word}${n === 1 ? "" : "s"}`;
+
+function renderQuestionList() {
+  $("#qList").replaceChildren(...state.rubrics.map((r) => el("li", {},
+    el("span", { class: "q-text" }, shorten(r.question, 90)),
+    el("button", { class: "btn", type: "button", "aria-label": `Edit: ${shorten(r.question, 40)}`,
+      onclick: () => { $("#questionsDialog").close(); openEditor(r.question_id); } }, "Edit"),
+    el("button", { class: "btn danger", type: "button", "aria-label": `Delete: ${shorten(r.question, 40)}`,
+      onclick: () => deleteQuestion(r) }, "Delete"),
+    el("span", { class: "q-info" }, `${plural(r.key_points.length, "point")}, ${plural(r.max_marks, "mark")}`))));
+}
+
+function openQuestionList() {
+  renderQuestionList();
+  $("#questionsDialog").showModal();
+}
+
+async function deleteQuestion(rubric) {
+  try {
+    const answers = await api(`/api/submissions?question_id=${encodeURIComponent(rubric.question_id)}`);
+    const extra = answers.length ? ` Its ${plural(answers.length, "answer")} and their marks will be deleted too.` : "";
+    if (!window.confirm(`Delete "${shorten(rubric.question, 60)}"?${extra} This cannot be undone.`)) return;
+    await api(`/api/rubrics/${encodeURIComponent(rubric.question_id)}`, { method: "DELETE" });
+    if ($("#questionFilter").value === rubric.question_id) $("#questionFilter").value = "";
+    await loadRubrics();
+    if (state.rubrics.length) renderQuestionList(); else $("#questionsDialog").close();
+    state.current = null;
+    await loadQueue();
+    toast("Question deleted.");
+  } catch (e) { toast(e.message, true); }
+}
+
+$("#qlNew").addEventListener("click", () => { $("#questionsDialog").close(); openEditor(null); });
+
+// ---------------------------------------------------------------- question editor
+// Keywords are stored as ["tilt|axis", ...]; teachers type "tilt or axis, 23.5 degrees".
+const wordsToText = (keywords) => keywords.map((k) => k.split("|").join(" or ")).join(", ");
+const textToWords = (text) => text.split(",")
+  .map((group) => group.split(/\s+or\s+|\//i).map((a) => a.trim()).filter(Boolean).join("|"))
+  .filter(Boolean);
+
+// "1. Earth is tilted (2)" -> { description: "Earth is tilted", marks: 2 }. A number only counts
+// as marks when it is in brackets or followed by "mark(s)", so "23.5 degrees" stays text.
+function parsePointLine(line) {
+  let text = line.replace(/^\s*(?:[-*•]|\(?\d{1,2}[.)])\s+/, "").trim();
+  let marks = 1;
+  const found = text.match(/\s*(?:[(\[]\s*(\d+(?:\.\d+)?)\s*(?:marks?|m)?\s*[)\]]|[-–:]?\s*(\d+(?:\.\d+)?)\s*marks?)\s*$/i);
+  if (found) {
+    const value = Number(found[1] || found[2]);
+    if (value > 0 && value <= 100) { marks = value; text = text.slice(0, found.index).trim(); }
+  }
+  return { description: text.replace(/[-–:]\s*$/, "").trim(), marks };
+}
+
+function slugFor(question) {
+  const base = question.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "").split("-").slice(0, 5).join("-").slice(0, 40) || "question";
+  let id = base, n = 2;
+  while (state.rubrics.some((r) => r.question_id === id)) id = `${base}-${n++}`;
+  return id;
+}
+
+const pointRows = () => [...$("#qPoints").children];
+
+function addPointRow(point = {}, after = null) {
+  const desc = el("input", { type: "text", class: "desc", maxlength: 500, placeholder: "One idea the answer must include" });
+  desc.value = point.description || "";
+  const marks = el("input", { type: "number", class: "marks", min: 0.5, max: 100, step: 0.5, inputmode: "decimal" });
+  marks.value = point.marks || 1;
+  const words = el("input", { type: "text", class: "words", placeholder: "Keywords, e.g. word or other word, second idea" });
+  words.value = wordsToText(point.keywords || []);
+  words.hidden = !$("#qUseWords").checked;
+  const remove = el("button", { class: "remove", type: "button" }, "×");
+  const row = el("li", { class: "point-row" }, el("span", { class: "num", "aria-hidden": "true" }), desc, marks, remove, words);
+  if (point.id) row.dataset.kpId = point.id;
+
+  remove.addEventListener("click", () => removePointRow(row));
+  [desc, marks].forEach((input) => {
+    input.addEventListener("input", () => { input.removeAttribute("aria-invalid"); updateTotal(); });
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.isComposing) { e.preventDefault(); addPointRow({}, row).focus(); }
+    });
+  });
+  desc.addEventListener("keydown", (e) => {
+    if (e.key === "Backspace" && desc.value === "" && pointRows().length > 1) { e.preventDefault(); removePointRow(row); }
+  });
+  desc.addEventListener("paste", (e) => {
+    const text = (e.clipboardData || window.clipboardData).getData("text");
+    if (!/\r?\n/.test(text.trim())) return; // a single line pastes normally
+    e.preventDefault();
+    let anchor = row;
+    text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean).map(parsePointLine).forEach((parsed, i) => {
+      if (i === 0 && !desc.value.trim()) { desc.value = parsed.description; marks.value = parsed.marks; return; }
+      addPointRow(parsed, anchor);
+      anchor = anchor.nextElementSibling;
+    });
+    updateTotal();
+  });
+
+  if (after) after.after(row); else $("#qPoints").append(row);
+  renumberPoints();
+  return desc;
+}
+
+function removePointRow(row) {
+  const rows = pointRows();
+  if (rows.length <= 1) return;
+  const index = rows.indexOf(row);
+  row.remove();
+  renumberPoints();
+  const next = pointRows()[Math.max(0, index - 1)].querySelector(".desc");
+  next.focus();
+  next.setSelectionRange(next.value.length, next.value.length);
+}
+
+function renumberPoints() {
+  const rows = pointRows();
+  rows.forEach((row, i) => {
+    row.querySelector(".num").textContent = i + 1;
+    row.querySelector(".desc").setAttribute("aria-label", `Point ${i + 1}`);
+    row.querySelector(".marks").setAttribute("aria-label", `Marks for point ${i + 1}`);
+    row.querySelector(".words").setAttribute("aria-label", `Keywords for point ${i + 1}`);
+    const remove = row.querySelector(".remove");
+    remove.setAttribute("aria-label", `Remove point ${i + 1}`);
+    remove.disabled = rows.length === 1;
+  });
+  updateTotal();
+}
+
+function updateTotal() {
+  const total = pointRows()
+    .filter((row) => row.querySelector(".desc").value.trim())
+    .reduce((sum, row) => sum + (Number(row.querySelector(".marks").value) || 0), 0);
+  $("#qTotal").textContent = `Total: ${plural(total, "mark")}`;
+}
+
+function fillQuestionForm(rubric, editingId) {
+  state.editingId = editingId;
+  $("#qTitle").textContent = editingId ? "Edit question" : "New question";
+  $("#qVersionNote").hidden = !editingId;
+  $("#qText").value = rubric ? rubric.question || "" : "";
+  $("#qModel").value = rubric ? rubric.model_answer || "" : "";
+  $("#qPartial").checked = rubric ? rubric.allow_partial !== false : true;
+  $("#qStep").value = rubric && Number(rubric.score_step) === 1 ? "1" : "0.5";
+  const points = rubric && Array.isArray(rubric.key_points) ? rubric.key_points : [];
+  $("#qUseWords").checked = points.some((kp) => kp.keywords && kp.keywords.length);
+  $("#qPoints").replaceChildren();
+  (points.length ? points : [{}, {}, {}]).forEach((kp) => addPointRow(kp));
+  $("#qMore").open = false;
+  $("#qAdvanced").open = false;
+  document.querySelectorAll("#questionForm [aria-invalid]").forEach((n) => n.removeAttribute("aria-invalid"));
+}
+
+function openEditor(editingId) {
+  const existing = state.rubrics.find((r) => r.question_id === editingId) || null;
+  fillQuestionForm(existing, existing ? editingId : null);
+  $("#questionDialog").showModal();
+  $("#qText").focus();
+}
+
+function collectQuestion({ markProblems = true } = {}) {
+  const problems = [];
+  const need = (ok, node, message) => {
+    if (ok) return;
+    problems.push({ node, message });
+    if (markProblems) node.setAttribute("aria-invalid", "true");
+  };
+  if (markProblems) document.querySelectorAll("#questionForm [aria-invalid]").forEach((n) => n.removeAttribute("aria-invalid"));
+  const question = $("#qText").value.trim();
+  need(question.length >= 3, $("#qText"), "Type the question.");
+
+  const used = new Set();
+  const filled = pointRows().filter((row) => row.querySelector(".desc").value.trim()); // blank rows are ignored
+  if (!filled.length) need(false, pointRows()[0].querySelector(".desc"), "Add at least one point.");
+  const points = filled.map((row) => {
+    const desc = row.querySelector(".desc"), marks = row.querySelector(".marks");
+    need(desc.value.trim().length >= 3, desc, "Make each point at least a few letters long.");
+    const value = Number(marks.value);
+    need(marks.value !== "" && value > 0 && value <= 100, marks, "Give each point some marks, for example 1.");
+    let id = row.dataset.kpId;
+    if (!id || used.has(id)) { let n = used.size + 1; while (used.has(`p${n}`)) n++; id = `p${n}`; }
+    used.add(id);
+    const keywords = $("#qUseWords").checked ? textToWords(row.querySelector(".words").value) : [];
+    return { id, description: desc.value.trim(), marks: value, keywords };
+  });
+  const total = Math.round(points.reduce((sum, kp) => sum + (kp.marks || 0), 0) * 100) / 100;
+  if (!problems.length && total > 100) problems.push({ node: $("#qAddPoint"), message: "The total can be at most 100 marks." });
+  if (!problems.length && points.length > 30) problems.push({ node: $("#qAddPoint"), message: "Use at most 30 points." });
+
+  const rubric = {
+    question_id: state.editingId || slugFor(question),
+    question, model_answer: $("#qModel").value.trim(), max_marks: total,
+    allow_partial: $("#qPartial").checked, score_step: Number($("#qStep").value),
+    key_points: points
+  };
+  return { rubric, problems };
+}
+
+function suggestPoints() {
+  const model = $("#qModel").value.trim();
+  if (!model) { toast("Write the model answer first.", true); $("#qModel").focus(); return; }
+  const sentences = model.split(/(?<=[.!?;])\s+|\n+/).map((t) => t.trim()).filter((t) => t.length >= 3).slice(0, 30);
+  const written = pointRows().some((row) => row.querySelector(".desc").value.trim());
+  if (written && !window.confirm("Replace the points you have written with ones made from the model answer?")) return;
+  $("#qPoints").replaceChildren();
+  sentences.forEach((sentence) => addPointRow({ description: sentence.slice(0, 500), marks: 1 }));
+  toast(`Added ${plural(sentences.length, "point")}, 1 mark each. Change them as you like.`);
+}
+
+$("#qAddPoint").addEventListener("click", () => addPointRow().focus());
+$("#qSuggest").addEventListener("click", suggestPoints);
+$("#qUseWords").addEventListener("change", () => {
+  pointRows().forEach((row) => { row.querySelector(".words").hidden = !$("#qUseWords").checked; });
+});
+$("#qAdvanced").addEventListener("toggle", () => {
+  if ($("#qAdvanced").open) $("#qJson").value = JSON.stringify(collectQuestion({ markProblems: false }).rubric, null, 2);
+});
+$("#qApplyJson").addEventListener("click", () => {
+  let data;
+  try { data = JSON.parse($("#qJson").value); } catch (e) { toast(`That is not valid JSON: ${e.message}`, true); return; }
+  if (!data || typeof data !== "object" || !Array.isArray(data.key_points)) {
+    toast("The JSON needs a key_points list.", true); return;
+  }
+  const id = typeof data.question_id === "string" && /^[A-Za-z0-9_-]{1,64}$/.test(data.question_id) ? data.question_id : state.editingId;
+  fillQuestionForm(data, id);
+  toast("Loaded into the form. Check it, then save.");
+});
+
+$("#questionForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const { rubric, problems } = collectQuestion();
+  if (problems.length) {
+    toast(problems[0].message, true);
+    problems[0].node.focus();
+    return;
+  }
+  try {
+    const saved = await api(`/api/rubrics/${encodeURIComponent(rubric.question_id)}`, {
+      method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(rubric)
+    });
+    $("#questionDialog").close();
+    await loadRubrics();
+    toast(saved.version > 1 ? "Question updated." : "Question saved. Now add answers.");
+    if (!state.current) renderEmpty();
+  } catch (e) { toast(e.message, true); }
+});
+
+document.querySelectorAll("[data-close]").forEach((b) => b.addEventListener("click", () => b.closest("dialog").close()));
+$("#uploadBtn").addEventListener("click", openUpload);
+$("#questionsBtn").addEventListener("click", () => (state.rubrics.length ? openQuestionList() : openEditor(null)));
+$("#exportBtn").addEventListener("click", () => {
+  const q = $("#questionFilter").value;
+  window.location.href = "/api/export.csv" + (q ? `?question_id=${encodeURIComponent(q)}` : "");
+});
+$("#questionFilter").addEventListener("change", () => loadQueue().catch((e) => toast(e.message, true)));
+
+function syncTabs() {
+  document.querySelectorAll("[data-tab]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.tab === state.tab)));
+}
+document.querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => {
+  state.tab = b.dataset.tab; syncTabs(); state.current = null;
+  loadQueue().catch((e) => toast(e.message, true));
+}));
+
+let resizeTimer;
+window.addEventListener("resize", () => {
+  clearTimeout(resizeTimer);
+  // Never re-render while the teacher is correcting text: it would discard their edits.
+  resizeTimer = setTimeout(() => { if (state.current && state.current.has_image && !state.editing) renderSheet(); }, 150);
+});
+
+(async () => {
+  try {
+    const health = await api("/api/health");
+    state.lowConfidence = health.low_ocr_confidence;
+    state.maxUploadMb = health.max_upload_mb;
+    await loadRubrics(); await loadQueue();
+  }
+  catch (e) { toast(`Could not reach the server: ${e.message}`, true); renderEmpty(); }
+})();
+</script>
+</body>
+</html>

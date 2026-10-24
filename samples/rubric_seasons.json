@@ -1,0 +1,18 @@
+{
+  "question_id": "seasons",
+  "question": "What causes the seasons on Earth?",
+  "model_answer": "The Earth's axis is tilted by about 23.5 degrees. As the Earth orbits the Sun, the hemisphere tilted towards the Sun receives more direct sunlight and has summer, while the other hemisphere has winter. The seasons are not caused by changes in the Earth's distance from the Sun.",
+  "max_marks": 5,
+  "score_step": 0.5,
+  "allow_partial": true,
+  "key_points": [
+    {"id": "tilt", "description": "The Earth's axis is tilted", "marks": 1,
+     "keywords": ["tilt|tilted|axis"]},
+    {"id": "orbit", "description": "The Earth orbits the Sun during the year", "marks": 1,
+     "keywords": ["orbit|orbits|revolves|goes around"]},
+    {"id": "summer", "description": "The hemisphere tilted towards the Sun has summer", "marks": 2,
+     "keywords": ["towards|toward|facing", "summer"]},
+    {"id": "distance", "description": "Seasons are not caused by distance from the Sun", "marks": 1,
+     "keywords": ["distance|far|close"]}
+  ]
+}

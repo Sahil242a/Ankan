@@ -1,0 +1,6 @@
+{"key_point": "The Earth's axis is tilted", "keywords": ["tilt|tilted|axis"], "answer": "The Earth is tilted on its axis.", "label": "covered"}
+{"key_point": "The Earth's axis is tilted", "keywords": ["tilt|tilted|axis", "earth"], "answer": "It is because of the tilt.", "label": "partial"}
+{"key_point": "The Earth's axis is tilted", "keywords": ["tilt|tilted|axis", "earth"], "answer": "The Sun is very hot in summer.", "label": "missed"}
+{"key_point": "The hemisphere tilted towards the Sun has summer", "keywords": ["towards|toward|facing", "summer"], "answer": "The half facing the Sun has summer.", "label": "covered"}
+{"key_point": "The hemisphere tilted towards the Sun has summer", "keywords": ["towards|toward|facing", "summer"], "answer": "Summer is the hottest season.", "label": "partial"}
+{"key_point": "The hemisphere tilted towards the Sun has summer", "keywords": ["towards|toward|facing", "summer"], "answer": "Winter is cold and dark.", "label": "missed"}

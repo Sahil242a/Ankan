@@ -1,0 +1,20 @@
+{
+  "question_id": "bio-q1",
+  "question": "Explain the process of photosynthesis. Where does it happen and what does it produce?",
+  "model_answer": "Photosynthesis takes place in the chloroplasts of green plant cells. The green pigment chlorophyll absorbs light energy from the sun. Using this energy, the plant combines water absorbed by the roots with carbon dioxide taken in through the stomata. Glucose is produced and stored as food, and oxygen is released into the air as a by-product.",
+  "max_marks": 5,
+  "score_step": 0.5,
+  "allow_partial": true,
+  "key_points": [
+    {"id": "location", "description": "Photosynthesis takes place in the chloroplasts", "marks": 1,
+     "keywords": ["chloroplast|chloroplasts|leaf|leaves"]},
+    {"id": "pigment", "description": "Chlorophyll absorbs light energy", "marks": 1,
+     "keywords": ["chlorophyll|green pigment", "light|sunlight|sun"]},
+    {"id": "inputs", "description": "Water and carbon dioxide are the raw materials", "marks": 1,
+     "keywords": ["water", "carbon dioxide|co2"]},
+    {"id": "glucose", "description": "Glucose is produced as food for the plant", "marks": 1,
+     "keywords": ["glucose|sugar|food"]},
+    {"id": "oxygen", "description": "Oxygen is released as a by-product", "marks": 1,
+     "keywords": ["oxygen|o2", "release|given out|by-product|byproduct"]}
+  ]
+}
